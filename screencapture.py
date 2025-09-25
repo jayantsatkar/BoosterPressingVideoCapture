@@ -1,48 +1,36 @@
 import sys
 from PyQt6 import QtWidgets
-from PyQt6.QtWidgets import QDialog, QApplication
-from PyQt6.QtWidgets import QMainWindow
+from PyQt6.QtWidgets import QApplication, QMainWindow
 from PyQt6.uic import loadUi
+from PyQt6.QtCore import QTimer
 
-
-class ScreenRecordStation(QDialog):   # second form
-    def __init__(self):
-        super().__init__()
-        print('QDialog')
-        loadUi("screenrecordstation.ui", self)
 
 class Screencap(QMainWindow):
     def __init__(self):
         super(Screencap, self).__init__()
+        self.setWindowTitle("Video Capture Station")
         loadUi("screencapturemain.ui", self)
 
-        self.radioBtnoption1.setStyleSheet("""
-        QRadioButton::indicator:checked { background-color: green; border: 1px solid black; }
-        QRadioButton::indicator:unchecked { background-color: red; border: 1px solid black; }
-        """)
-        self.radioBtnoption2.setStyleSheet("""
-        QRadioButton::indicator:checked { background-color: green; border: 1px solid black; }
-        QRadioButton::indicator:unchecked { background-color: red; border: 1px solid black; }
-        """)
+        ##Fix the Screen Size
+        #self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowMaximizeButtonHint)
+        # Also prevent resizing if needed
+        # Remove maximize button but keep close and minimize buttons
+        #self.setWindowFlag(Qt.WindowType.WindowMaximizeButtonHint, False)
 
-        # Example of connecting to check change
-        self.radioBtnoption1.toggled.connect(self.radio_changed)
-        self.radioBtnoption2.toggled.connect(self.radio_changed)
+        # Optional: Fix the window size to current size (prevents resizing)
+        #self.setFixedSize(self.size())
 
-        # connect radio buttons
-        self.radioBtnoption1.toggled.connect(self.radio_changed)
-        self.radioBtnoption2.toggled.connect(self.radio_changed)
+        self.red_on = True
+        self.green_on = False
+       
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.toggle_leds)
+        self.timer.start(1000)  # 1000 ms = 1 sec
 
-        # connect start/stop buttons
         self.BtnStart.clicked.connect(self.start_action)
         self.BtnStop.clicked.connect(self.stop_action)
         self.BtnConfig.clicked.connect(self.config_action)
 
-    def radio_changed(self):
-        if self.radioBtnoption1.isChecked():
-            print("Radio Option 1 selected")
-        elif self.radioBtnoption2.isChecked():
-            print("Radio Option 2 selected")
 
     def start_action(self):
         print("Start clicked")
@@ -54,11 +42,22 @@ class Screencap(QMainWindow):
       self.config_window = ConfigDialog()   # create dialog
       self.config_window.show()  
 
-        # print("Configure clicked")
-    def open_config(self):
-        self.config_window = ScreenRecordStation()
-        self.config_window.exec()
+    def toggle_leds(self):
+        """Swap red/green LED states"""
+        self.red_on = not self.red_on
+        self.green_on = not self.green_on
+        self.update_leds()
 
+    def update_leds(self):
+        """Update LED colors based on states"""
+        self.ledRed.setStyleSheet(
+            "background-color: red; border-radius: 12px;" if self.red_on
+            else "background-color: grey; border-radius: 12px;"
+        )
+        self.ledGreen.setStyleSheet(
+            "background-color: green; border-radius: 12px;" if self.green_on
+            else "background-color: grey; border-radius: 12px;"
+        )
 
 class ConfigDialog(QMainWindow):   # config dialog
     def __init__(self):
@@ -66,13 +65,11 @@ class ConfigDialog(QMainWindow):   # config dialog
         super(ConfigDialog, self).__init__()
         loadUi("screenrecordstation.ui", self)
 
-    
-    
 app = QApplication(sys.argv)
 mainwindow = Screencap()
 widget = QtWidgets.QStackedWidget()
 widget.addWidget(mainwindow)      
-widget.showMaximized()
-widget.setGeometry(100, 100, 700, 600)  # x, y, width, height
+widget.setGeometry(100, 100, 600, 400)  # x, y, width, height
+
 widget.show()
 app.exec()
