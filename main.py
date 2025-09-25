@@ -5,6 +5,7 @@ from PyQt6.uic import loadUi
 from PyQt6.QtCore import QTimer
 from configparser import ConfigParser
 from errorLogger import LogError
+
 class Screencap(QMainWindow):
     def __init__(self):
         super(Screencap, self).__init__()
@@ -27,12 +28,9 @@ class Screencap(QMainWindow):
         config = ConfigParser()
 
         config.read('config.ini')
-        #self.logger.info('Application Version:'+str(config.get('Application','VERSION')))
+        self.logger.info('Application Version:'+str(config.get('Application','VERSION')))
         self.PLCIp = str(config.get('Application','PLCIP'))
-        self.VERSION = str(config.get('Application','VERSION'))
-        self.FPS_LIMIT = int(config.get('Application','FPS_LIMIT'))
-        self.frameDirectory = config['Application']['frameDirectory'] #r"C:\Users\TMC8\Desktop\Casting Inspection borescope sw\01 Python - video to 2D unwrapped image\tonytrail\outputdir"#str(config.get('Application','frameDirectory'))
-        #self.logger.info('frameDirectory:'+ self. frameDirectory)
+                
 
 
     def start_action(self):
@@ -65,10 +63,11 @@ class Screencap(QMainWindow):
 class ConfigDialog(QMainWindow):   # config dialog
     def __init__(self):
         print('Open Config Window')
+        config = ConfigParser()
         super(ConfigDialog, self).__init__()
         loadUi("screenrecordstation.ui", self)
-        self.hide()
-
+        PLCIp = str(config.get('Application','PLCIP'))
+        self.txtIP.setText(PLCIp)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>693</width>
+    <height>540</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,13 +18,13 @@
 background-color: rgb(170, 255, 255);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="lblConfiguration">
     <property name="geometry">
      <rect>
-      <x>198</x>
+      <x>230</x>
       <y>20</y>
-      <width>281</width>
-      <height>20</height>
+      <width>221</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -32,7 +32,7 @@ background-color: rgb(170, 255, 255);</string>
 font: 16pt &quot;Segoe UI&quot;;</string>
     </property>
     <property name="text">
-     <string>  Screen Recorder Station</string>
+     <string>System Configuration </string>
     </property>
    </widget>
    <widget class="QLabel" name="lblPLC">
@@ -57,7 +57,7 @@ font: 11pt &quot;Segoe UI&quot;;</string>
      <rect>
       <x>270</x>
       <y>80</y>
-      <width>49</width>
+      <width>21</width>
       <height>16</height>
      </rect>
     </property>
@@ -130,7 +130,7 @@ font: 11pt &quot;Segoe UI&quot;;</string>
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineIP">
+   <widget class="QLineEdit" name="txtIP">
     <property name="geometry">
      <rect>
       <x>340</x>
