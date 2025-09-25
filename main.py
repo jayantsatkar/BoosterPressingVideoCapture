@@ -3,22 +3,15 @@ from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QApplication, QMainWindow
 from PyQt6.uic import loadUi
 from PyQt6.QtCore import QTimer
-
-
+from configparser import ConfigParser
+from errorLogger import LogError
 class Screencap(QMainWindow):
     def __init__(self):
         super(Screencap, self).__init__()
         self.setWindowTitle("Video Capture Station")
         loadUi("screencapturemain.ui", self)
-
-        ##Fix the Screen Size
-        #self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowMaximizeButtonHint)
-        # Also prevent resizing if needed
-        # Remove maximize button but keep close and minimize buttons
-        #self.setWindowFlag(Qt.WindowType.WindowMaximizeButtonHint, False)
-
-        # Optional: Fix the window size to current size (prevents resizing)
-        #self.setFixedSize(self.size())
+        self.logger = LogError.GetLogger()
+        #self.logger = LogError.GetLogger()
 
         self.red_on = True
         self.green_on = False
@@ -30,6 +23,16 @@ class Screencap(QMainWindow):
         self.BtnStart.clicked.connect(self.start_action)
         self.BtnStop.clicked.connect(self.stop_action)
         self.BtnConfig.clicked.connect(self.config_action)
+
+        config = ConfigParser()
+
+        config.read('config.ini')
+        #self.logger.info('Application Version:'+str(config.get('Application','VERSION')))
+        self.PLCIp = str(config.get('Application','PLCIP'))
+        self.VERSION = str(config.get('Application','VERSION'))
+        self.FPS_LIMIT = int(config.get('Application','FPS_LIMIT'))
+        self.frameDirectory = config['Application']['frameDirectory'] #r"C:\Users\TMC8\Desktop\Casting Inspection borescope sw\01 Python - video to 2D unwrapped image\tonytrail\outputdir"#str(config.get('Application','frameDirectory'))
+        #self.logger.info('frameDirectory:'+ self. frameDirectory)
 
 
     def start_action(self):
@@ -61,15 +64,17 @@ class Screencap(QMainWindow):
 
 class ConfigDialog(QMainWindow):   # config dialog
     def __init__(self):
-        print('QMainWindow')
+        print('Open Config Window')
         super(ConfigDialog, self).__init__()
         loadUi("screenrecordstation.ui", self)
+        self.hide()
 
-app = QApplication(sys.argv)
-mainwindow = Screencap()
-widget = QtWidgets.QStackedWidget()
-widget.addWidget(mainwindow)      
-widget.setGeometry(100, 100, 600, 400)  # x, y, width, height
 
-widget.show()
-app.exec()
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    mainwindow = Screencap()
+    widget = QtWidgets.QStackedWidget()
+    widget.addWidget(mainwindow)      
+    widget.setGeometry(100, 100, 600, 400)  # x, y, width, height
+    widget.show()
+    app.exec()
