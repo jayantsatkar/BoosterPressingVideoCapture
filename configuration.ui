@@ -15,7 +15,8 @@
   </property>
   <property name="styleSheet">
    <string notr="true">
-background-color: rgb(170, 255, 255);</string>
+background-color: rgb(170, 255, 255);
+</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="minimumSize">
@@ -29,6 +30,54 @@ background-color: rgb(170, 255, 255);</string>
      <width>690</width>
      <height>350</height>
     </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLineEdit {
+    background-color: #ecf0f1;
+    border: 1px solid #3498db;
+    border-radius: 3px;
+    padding: 2px;
+    font-size: 14px;
+    color: #2c3e50;
+}
+QLineEdit:focus {
+    border: 2px solid #2980b9;
+    background-color: #ffffff;
+}
+
+QComboBox {
+    background-color: #ecf0f1;
+    border: 2px solid #3498db;
+    border-radius: 2px;
+    padding: 2px;
+    font-size: 14px;
+    color: #2c3e50;
+}
+QComboBox:focus {
+    border: 2px solid #2980b9;
+    background-color: #ffffff;
+}
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+    border-left: 1px solid #3498db;
+    background-color: #3498db;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+QComboBox::down-arrow {
+    image: url(:/qt-project.org/styles/commonstyle/images/arrowdown-16.png);
+    width: 12px;
+    height: 12px;
+}
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    border: 1px solid #3498db;
+    selection-background-color: #3498db;
+    selection-color: white;
+}
+</string>
    </property>
    <widget class="QLabel" name="lblConfiguration">
     <property name="geometry">
@@ -135,9 +184,9 @@ font: 11pt &quot;Segoe UI&quot;;</string>
    <widget class="QLineEdit" name="txtIP">
     <property name="geometry">
      <rect>
-      <x>362</x>
+      <x>352</x>
       <y>70</y>
-      <width>91</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
@@ -172,8 +221,20 @@ font: 11pt &quot;Segoe UI&quot;;</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">color: rgb(170, 0, 0);
-font: 11pt &quot;Segoe UI&quot;;</string>
+     <string notr="true">QPushButton {
+    background-color: #3498db;
+    color: white;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #2980b9;
+}
+QPushButton:pressed {
+    background-color: #1c6690;
+}
+</string>
     </property>
     <property name="text">
      <string>Save</string>
@@ -182,15 +243,27 @@ font: 11pt &quot;Segoe UI&quot;;</string>
    <widget class="QPushButton" name="btnTestConnection">
     <property name="geometry">
      <rect>
-      <x>510</x>
+      <x>500</x>
       <y>230</y>
-      <width>121</width>
+      <width>131</width>
       <height>24</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">color: rgb(170, 0, 0);
-font: 11pt &quot;Segoe UI&quot;;</string>
+     <string notr="true">QPushButton {
+    background-color: #3498db;
+    color: white;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #2980b9;
+}
+QPushButton:pressed {
+    background-color: #1c6690;
+}
+</string>
     </property>
     <property name="text">
      <string>Test Connection</string>
@@ -244,8 +317,20 @@ Tag</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">color: rgb(170, 0, 0);
-font: 11pt &quot;Segoe UI&quot;;</string>
+     <string notr="true">QPushButton {
+    background-color: #3498db;
+    color: white;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #2980b9;
+}
+QPushButton:pressed {
+    background-color: #1c6690;
+}
+</string>
     </property>
     <property name="text">
      <string>Back</string>
@@ -269,7 +354,7 @@ font: 11pt &quot;Segoe UI&quot;;</string>
 Stop</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="txtAckTag_2">
+   <widget class="QLineEdit" name="txtCycleStart">
     <property name="geometry">
      <rect>
       <x>550</x>

@@ -5,6 +5,7 @@ from PyQt6.uic import loadUi
 from PyQt6.QtCore import QTimer
 from configparser import ConfigParser
 from errorLogger import LogError
+import socket
 
 class Mainwindow(QMainWindow):
     def __init__(self):
@@ -92,12 +93,12 @@ class ConfigWindow(QMainWindow):   # config dialog
         self.txtAckTag.setText(ack_tag)
 
 
-        # ##PLC Port
-        # plc_port = str(self.config.get('Application','plc_port'))
-        # self.txtPort.setText(plc_port)
+        ##Cycle Start
+        cycle_start_stop = str(self.config.get('Application','cycle_start_stop'))
+        self.txtCycleStart.setText(cycle_start_stop)
 
 
-        self.comboPLC.currentIndexChanged.connect(self.selection_changed)
+        #self.comboPLC.currentIndexChanged.connect(self.selection_changed)
         if "Stations" in self.config:
             for station_id, station_name in self.config["Stations"].items():
                 # Add text + hidden ID
@@ -125,6 +126,8 @@ class ConfigWindow(QMainWindow):   # config dialog
 
         selected_id = self.comboPLC.currentData()   
         self.config.set("Application", "plc_id", selected_id)
+        self.config.set("Application", "cycle_start_stop", self.txtCycleStart.text())
+
         
         with open("config.ini", "w") as f:
             self.config.write(f)
@@ -135,7 +138,40 @@ class ConfigWindow(QMainWindow):   # config dialog
     def btnBack_clicked(self):
         self.close()
     def btnTestConnection_clicked(self):
-        print('TestConnection Button Clicked')
+
+        HOST = self.config.get('Application','PLCIP')
+        PORT = int(self.config.get('Application','plc_port'))
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(5)  # 5 sec timeout
+
+        try:
+            sock.connect((HOST, PORT))
+            #QMessageBox.information(self, "Success", "Connection is successful")
+            msg = QMessageBox(self)
+            msg.setIcon(QMessageBox.Icon.Information)
+            msg.setWindowTitle("Connection Status")
+            msg.setText(f"Connected successfully to {HOST}:{PORT}")
+            msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+            msg.exec()
+        except socket.timeout:
+            #QMessageBox.critical(self, "Failure", "Connection is successful")
+            msg = QMessageBox(self)
+            msg.setIcon(QMessageBox.Icon.Critical)
+            msg.setWindowTitle("Connection Status")
+            msg.setText(f"Failed to connect to {HOST}:{PORT}")
+            msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+            msg.exec()
+
+        except socket.error as e:
+            msg = QMessageBox(self)
+            msg.setIcon(QMessageBox.Icon.Critical)
+            msg.setWindowTitle("Connection Status")
+            msg.setText(f"❌ Failed to connect to {HOST}:{PORT}")
+            msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+            msg.exec()
+        finally:
+            sock.close()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
