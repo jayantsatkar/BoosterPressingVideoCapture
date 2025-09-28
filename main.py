@@ -6,9 +6,9 @@ from PyQt6.QtCore import QTimer
 from configparser import ConfigParser
 from errorLogger import LogError
 
-class Screencap(QMainWindow):
+class Mainwindow(QMainWindow):
     def __init__(self):
-        super(Screencap, self).__init__()
+        super(Mainwindow, self).__init__()
         self.setWindowTitle("Video Capture Station")
         loadUi("screencapturemain.ui", self)
         self.logger = LogError.GetLogger()
@@ -30,6 +30,7 @@ class Screencap(QMainWindow):
         config.read('config.ini')
         self.logger.info('Application Version:'+str(config.get('Application','VERSION')))
         self.PLCIp = str(config.get('Application','PLCIP'))
+        print(self.PLCIp)
                 
 
 
@@ -71,9 +72,11 @@ class ConfigDialog(QMainWindow):   # config dialog
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    mainwindow = Screencap()
-    widget = QtWidgets.QStackedWidget()
-    widget.addWidget(mainwindow)      
-    widget.setGeometry(100, 100, 600, 400)  # x, y, width, height
-    widget.show()
+    mainwindow = Mainwindow()
+    mainwindow.setWindowTitle("Hello")
+    # widget = QtWidgets.QStackedWidget()
+    # widget.addWidget(mainwindow)      
+    # widget.setGeometry(100, 100, 600, 400)  # x, y, width, height
+    # widget.show()
+    mainwindow.show()
     app.exec()
