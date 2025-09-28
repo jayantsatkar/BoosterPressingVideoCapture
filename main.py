@@ -10,7 +10,7 @@ class Mainwindow(QMainWindow):
     def __init__(self):
         super(Mainwindow, self).__init__()
         self.setWindowTitle("Video Capture Station")
-        loadUi("screencapturemain.ui", self)
+        loadUi("main.ui", self)
         #self.logger = LogError.GetLogger()
         self.logger = LogError.get_logger()
 
@@ -65,7 +65,7 @@ class ConfigWindow(QMainWindow):   # config dialog
     def __init__(self):
         print('Open Config Window')
         super(ConfigWindow, self).__init__()
-        loadUi("screenrecordstation.ui", self)
+        loadUi("configuration.ui", self)
 
         self.config = ConfigParser()
         self.config.read('config.ini')
