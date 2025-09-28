@@ -11,8 +11,8 @@ class Mainwindow(QMainWindow):
         super(Mainwindow, self).__init__()
         self.setWindowTitle("Video Capture Station")
         loadUi("screencapturemain.ui", self)
-        self.logger = LogError.GetLogger()
         #self.logger = LogError.GetLogger()
+        self.logger = LogError.get_logger()
 
         self.red_on = True
         self.green_on = False
@@ -41,7 +41,7 @@ class Mainwindow(QMainWindow):
         print("Stop clicked")
 
     def config_action(self):
-      self.config_window = ConfigDialog()   # create dialog
+      self.config_window = ConfigWindow()   # create dialog
       self.config_window.show()  
 
     def toggle_leds(self):
@@ -61,19 +61,71 @@ class Mainwindow(QMainWindow):
             else "background-color: grey; border-radius: 12px;"
         )
 
-class ConfigDialog(QMainWindow):   # config dialog
+class ConfigWindow(QMainWindow):   # config dialog
     def __init__(self):
         print('Open Config Window')
-        config = ConfigParser()
-        super(ConfigDialog, self).__init__()
+        super(ConfigWindow, self).__init__()
         loadUi("screenrecordstation.ui", self)
-        PLCIp = str(config.get('Application','PLCIP'))
+
+        self.config = ConfigParser()
+        self.config.read('config.ini')
+        
+        self.btnSave.clicked.connect(self.btnSave_clicked)
+        self.btnBack.clicked.connect(self.btnBack_clicked)
+        self.btnTestConnection.clicked.connect(self.btnTestConnection_clicked)
+
+        ##PLC IP
+        PLCIp = str(self.config.get('Application','PLCIP'))
         self.txtIP.setText(PLCIp)
+
+        ##PLC Port
+        plc_port = str(self.config.get('Application','plc_port'))
+        self.txtPort.setText(plc_port)
+
+        ##USN TAG
+        usn_tag = str(self.config.get('Application','usn_tag'))
+        self.txtUSNTag.setText(usn_tag)
+
+
+        ##ack Tag
+        ack_tag = str(self.config.get('Application','ack_tag'))
+        self.txtAckTag.setText(ack_tag)
+
+
+        # ##PLC Port
+        # plc_port = str(self.config.get('Application','plc_port'))
+        # self.txtPort.setText(plc_port)
+
+
+        self.comboPLC.currentIndexChanged.connect(self.selection_changed)
+        if "Stations" in self.config:
+            for station_id, station_name in self.config["Stations"].items():
+                # Add text + hidden ID
+                self.comboPLC.addItem(station_name, int(station_id))
+  
+
+    def selection_changed(self, index):
+        text = self.comboPLC.currentText()
+        station_id = self.comboPLC.itemData(index)
+        print(f"Selected: {text} (ID={station_id})")
+    
+    def btnSave_clicked(self):
+        print('Save Button Clicked')
+        self.config.set("Application", "PLCIP", self.txtIP.text())
+        with open("config.ini", "w") as f:
+            self.config.write(f)
+        
+
+
+    def btnBack_clicked(self):
+        self.close()
+    def btnTestConnection_clicked(self):
+        print('TestConnection Button Clicked')
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     mainwindow = Mainwindow()
-    mainwindow.setWindowTitle("Hello")
+    mainwindow.setWindowTitle("Video Capture")
     # widget = QtWidgets.QStackedWidget()
     # widget.addWidget(mainwindow)      
     # widget.setGeometry(100, 100, 600, 400)  # x, y, width, height

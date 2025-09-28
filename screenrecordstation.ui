@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>693</width>
-    <height>540</height>
+    <height>372</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Configuration Screen</string>
   </property>
   <property name="styleSheet">
    <string notr="true">
@@ -86,13 +86,13 @@ font: 11pt &quot;Segoe UI&quot;;</string>
      <string>PORT</string>
     </property>
    </widget>
-   <widget class="QLabel" name="lblTagNo">
+   <widget class="QLabel" name="lblTagUSN">
     <property name="geometry">
      <rect>
       <x>50</x>
       <y>160</y>
-      <width>51</width>
-      <height>16</height>
+      <width>61</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -100,15 +100,15 @@ font: 11pt &quot;Segoe UI&quot;;</string>
 font: 11pt &quot;Segoe UI&quot;;</string>
     </property>
     <property name="text">
-     <string>TAG No</string>
+     <string>USN Tag</string>
     </property>
    </widget>
    <widget class="QLabel" name="lblPowereBy">
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>490</y>
-      <width>371</width>
+      <y>310</y>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -117,17 +117,7 @@ font: 11pt &quot;Segoe UI&quot;;</string>
 font: 11pt &quot;Segoe UI&quot;;</string>
     </property>
     <property name="text">
-     <string>Powered By Magnetivity Solution Private Limited</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="linePLC">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>80</y>
-      <width>113</width>
-      <height>21</height>
-     </rect>
+     <string>Powered By Magnetivity</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="txtIP">
@@ -140,7 +130,7 @@ font: 11pt &quot;Segoe UI&quot;;</string>
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="linePort">
+   <widget class="QLineEdit" name="txtPort">
     <property name="geometry">
      <rect>
       <x>550</x>
@@ -150,21 +140,21 @@ font: 11pt &quot;Segoe UI&quot;;</string>
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineTAGNo">
+   <widget class="QLineEdit" name="txtUSNTag">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>132</x>
       <y>160</y>
-      <width>113</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="BtnSave">
+   <widget class="QPushButton" name="btnSave">
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>270</y>
+      <y>230</y>
       <width>79</width>
       <height>24</height>
      </rect>
@@ -177,71 +167,11 @@ font: 11pt &quot;Segoe UI&quot;;</string>
      <string>Save</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="BtnCancel">
+   <widget class="QPushButton" name="btnTestConnection">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>270</y>
-      <width>79</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">color: rgb(170, 0, 0);
-font: 11pt &quot;Segoe UI&quot;;</string>
-    </property>
-    <property name="text">
-     <string>Cancel</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioBtnR">
-    <property name="geometry">
-     <rect>
-      <x>470</x>
-      <y>340</y>
-      <width>92</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioBtnG">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>340</y>
-      <width>92</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="BtnACKNo">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>340</y>
-      <width>141</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">color: rgb(170, 0, 0);
-font: 11pt &quot;Segoe UI&quot;;</string>
-    </property>
-    <property name="text">
-     <string>ACK TAG No</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="BtnTestCon">
-    <property name="geometry">
-     <rect>
-      <x>460</x>
-      <y>270</y>
+      <x>430</x>
+      <y>230</y>
       <width>121</width>
       <height>24</height>
      </rect>
@@ -254,13 +184,13 @@ font: 11pt &quot;Segoe UI&quot;;</string>
      <string>Test Connection</string>
     </property>
    </widget>
-   <widget class="QLabel" name="lblTagContent">
+   <widget class="QLabel" name="lblAckTag">
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>170</y>
-      <width>91</width>
-      <height>16</height>
+      <x>260</x>
+      <y>160</y>
+      <width>141</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -268,17 +198,44 @@ font: 11pt &quot;Segoe UI&quot;;</string>
 font: 11pt &quot;Segoe UI&quot;;</string>
     </property>
     <property name="text">
-     <string>TAG Content</string>
+     <string>Acknowledment Tag</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineTAGContent">
+   <widget class="QLineEdit" name="txtAckTag">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>170</y>
+      <x>430</x>
+      <y>160</y>
       <width>113</width>
       <height>21</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboPLC">
+    <property name="geometry">
+     <rect>
+      <x>129</x>
+      <y>80</y>
+      <width>101</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnBack">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>230</y>
+      <width>79</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(170, 0, 0);
+font: 11pt &quot;Segoe UI&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Back</string>
     </property>
    </widget>
   </widget>
