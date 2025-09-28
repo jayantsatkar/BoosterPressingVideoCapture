@@ -1,6 +1,6 @@
 import sys
 from PyQt6 import QtWidgets
-from PyQt6.QtWidgets import QApplication, QMainWindow
+from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PyQt6.uic import loadUi
 from PyQt6.QtCore import QTimer
 from configparser import ConfigParser
@@ -101,7 +101,14 @@ class ConfigWindow(QMainWindow):   # config dialog
         if "Stations" in self.config:
             for station_id, station_name in self.config["Stations"].items():
                 # Add text + hidden ID
-                self.comboPLC.addItem(station_name, int(station_id))
+                self.comboPLC.addItem(station_name, station_id)
+
+        saved_id = self.config.getint("Application", "plc_id", fallback=-1)
+
+        # find index of item with this ID
+        idx = self.comboPLC.findData(saved_id)
+        if idx >= 0:
+            self.comboPLC.setCurrentIndex(idx)
   
 
     def selection_changed(self, index):
@@ -112,9 +119,17 @@ class ConfigWindow(QMainWindow):   # config dialog
     def btnSave_clicked(self):
         print('Save Button Clicked')
         self.config.set("Application", "PLCIP", self.txtIP.text())
+        self.config.set("Application", "plc_port", self.txtPort.text())
+        self.config.set("Application", "usn_tag", self.txtUSNTag.text())
+        self.config.set("Application", "ack_tag", self.txtAckTag.text())
+
+        selected_id = self.comboPLC.currentData()   
+        self.config.set("Application", "plc_id", selected_id)
+        
         with open("config.ini", "w") as f:
             self.config.write(f)
-        
+            
+        QMessageBox.information(self, "Success", "Settings saved successfully!")
 
 
     def btnBack_clicked(self):
