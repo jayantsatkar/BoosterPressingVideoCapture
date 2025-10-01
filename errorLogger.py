@@ -38,7 +38,8 @@ class LogError:
         )
 
         # Log filename format after rotation: app.log.YYYY-MM-DD
-        handler.suffix = "%Y-%m-%d"
+        # handler.suffix = "%Y-%m-%d"
+        handler.suffix = "%Y-%m-%d.app.log"
 
         # Log format
         formatter = logging.Formatter(
