@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PyQt6.uic import loadUi
 from PyQt6.QtCore import QTimer
 from configparser import ConfigParser
+from PlcModTCP import get_dmc_number
 from errorLogger import LogError
 import socket
 
@@ -18,9 +19,9 @@ class Mainwindow(QMainWindow):
         self.red_on = True
         #self.green_on = False
        
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.toggle_leds)
-        self.timer.start(1000)  # 1000 ms = 1 sec
+        # self.timer = QTimer(self)
+        # self.timer.timeout.connect(self.toggle_leds)
+        # self.timer.start(1000)  # 1000 ms = 1 sec
 
         self.BtnStart.clicked.connect(self.start_action)
         self.BtnStop.clicked.connect(self.stop_action)
@@ -34,9 +35,8 @@ class Mainwindow(QMainWindow):
         print(self.PLCIp)
                 
 
-
     def start_action(self):
-        print("Start clicked")
+        self.update_led('green')
 
     def stop_action(self):
         print("Stop clicked")
@@ -61,6 +61,17 @@ class Mainwindow(QMainWindow):
         #     "background-color: green; border-radius: 12px;" if self.green_on
         #     else "background-color: grey; border-radius: 12px;"
         # )
+
+    def update_led(self, color_name):
+        """Set LED color dynamically"""
+        self.led.setStyleSheet(
+        f"background-color: {color_name}; border-radius: 28px;"
+        )
+
+    def cycle_start(self):
+        self.update_led('green')
+        dmc = get_dmc_number(self.config.get('Application','plcip'),self.config.get('Application','plc_port'),666) 
+
 
 class ConfigWindow(QMainWindow):   # config dialog
     def __init__(self):
@@ -177,9 +188,5 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     mainwindow = Mainwindow()
     mainwindow.setWindowTitle("Video Capture")
-    # widget = QtWidgets.QStackedWidget()
-    # widget.addWidget(mainwindow)      
-    # widget.setGeometry(100, 100, 600, 400)  # x, y, width, height
-    # widget.show()
     mainwindow.show()
     app.exec()
