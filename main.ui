@@ -25,6 +25,10 @@
   <property name="windowTitle">
    <string>Part Video Recording Station</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>resources/magnetivity_vLw_icon.ico</normaloff>resources/magnetivity_vLw_icon.ico</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(170, 255, 255);</string>
   </property>
