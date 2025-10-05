@@ -16,7 +16,7 @@ class Mainwindow(QMainWindow):
         self.logger = LogError.get_logger()
 
         self.red_on = True
-        self.green_on = False
+        #self.green_on = False
        
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.toggle_leds)
@@ -48,7 +48,7 @@ class Mainwindow(QMainWindow):
     def toggle_leds(self):
         """Swap red/green LED states"""
         self.red_on = not self.red_on
-        self.green_on = not self.green_on
+        #self.green_on = not self.green_on
         self.update_leds()
 
     def update_leds(self):
@@ -57,10 +57,10 @@ class Mainwindow(QMainWindow):
             "background-color: red; border-radius: 12px;" if self.red_on
             else "background-color: grey; border-radius: 12px;"
         )
-        self.ledGreen.setStyleSheet(
-            "background-color: green; border-radius: 12px;" if self.green_on
-            else "background-color: grey; border-radius: 12px;"
-        )
+        # self.ledGreen.setStyleSheet(
+        #     "background-color: green; border-radius: 12px;" if self.green_on
+        #     else "background-color: grey; border-radius: 12px;"
+        # )
 
 class ConfigWindow(QMainWindow):   # config dialog
     def __init__(self):

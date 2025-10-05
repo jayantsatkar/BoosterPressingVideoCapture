@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
+    <width>500</width>
     <height>400</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>600</width>
+    <width>500</width>
     <height>400</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>600</width>
+    <width>500</width>
     <height>400</height>
    </size>
   </property>
@@ -32,15 +32,27 @@
    <widget class="QPushButton" name="BtnConfig">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>100</y>
+      <x>340</x>
+      <y>150</y>
       <width>101</width>
-      <height>71</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">color: rgb(170, 0, 0);
-font: 14pt &quot;Segoe UI&quot;;</string>
+     <string notr="true">QPushButton {
+    background-color: #3498db;
+    color: white;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #2980b9;
+}
+QPushButton:pressed {
+    background-color: #1c6690;
+}
+</string>
     </property>
     <property name="text">
      <string>Configure</string>
@@ -74,15 +86,26 @@ color: rgb(0, 0, 255);</string>
    <widget class="QPushButton" name="BtnStart">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>100</y>
+      <x>40</x>
+      <y>150</y>
       <width>101</width>
-      <height>71</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">color: rgb(170, 0, 0);
-font: 14pt &quot;Segoe UI&quot;;
+     <string notr="true">QPushButton {
+    background-color: #3498db;
+    color: white;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #2980b9;
+}
+QPushButton:pressed {
+    background-color: #1c6690;
+}
 </string>
     </property>
     <property name="text">
@@ -92,15 +115,26 @@ font: 14pt &quot;Segoe UI&quot;;
    <widget class="QPushButton" name="BtnStop">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>100</y>
+      <x>190</x>
+      <y>150</y>
       <width>101</width>
-      <height>71</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">color: rgb(170, 0, 0);
-font: 14pt &quot;Segoe UI&quot;;
+     <string notr="true">QPushButton {
+    background-color: #3498db;
+    color: white;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #2980b9;
+}
+QPushButton:pressed {
+    background-color: #1c6690;
+}
 </string>
     </property>
     <property name="text">
@@ -110,7 +144,7 @@ font: 14pt &quot;Segoe UI&quot;;
    <widget class="QLabel" name="lblUSN">
     <property name="geometry">
      <rect>
-      <x>60</x>
+      <x>40</x>
       <y>220</y>
       <width>51</width>
       <height>31</height>
@@ -144,7 +178,7 @@ font: 11pt &quot;Segoe UI&quot;;</string>
    <widget class="QLabel" name="lblUSNText">
     <property name="geometry">
      <rect>
-      <x>200</x>
+      <x>150</x>
       <y>220</y>
       <width>131</width>
       <height>31</height>
@@ -161,9 +195,9 @@ color: rgb(170, 0, 0);</string>
    <widget class="QLabel" name="lblMessage">
     <property name="geometry">
      <rect>
-      <x>60</x>
+      <x>40</x>
       <y>290</y>
-      <width>511</width>
+      <width>401</width>
       <height>31</height>
      </rect>
     </property>
@@ -178,56 +212,28 @@ font: 14pt &quot;Segoe UI&quot;;</string>
    <widget class="QLabel" name="ledRed">
     <property name="geometry">
      <rect>
-      <x>500</x>
-      <y>90</y>
-      <width>40</width>
-      <height>40</height>
+      <x>210</x>
+      <y>70</y>
+      <width>60</width>
+      <height>60</height>
      </rect>
     </property>
     <property name="minimumSize">
      <size>
-      <width>40</width>
-      <height>40</height>
+      <width>60</width>
+      <height>60</height>
      </size>
     </property>
     <property name="maximumSize">
      <size>
-      <width>40</width>
-      <height>40</height>
+      <width>60</width>
+      <height>60</height>
      </size>
     </property>
     <property name="styleSheet">
      <string notr="true">QLabel {
     background-color: red;
-    border-radius: 18px;
-}</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="ledGreen">
-    <property name="geometry">
-     <rect>
-      <x>500</x>
-      <y>150</y>
-      <width>40</width>
-      <height>40</height>
-     </rect>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>40</width>
-      <height>40</height>
-     </size>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>40</width>
-      <height>40</height>
-     </size>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QLabel {
-    background-color: green;
-    border-radius: 18px;
+    border-radius: 28px;
 }</string>
     </property>
    </widget>
