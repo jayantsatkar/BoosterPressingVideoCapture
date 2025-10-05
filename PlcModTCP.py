@@ -16,9 +16,11 @@ class PLCClient:
             connection = self.client.connect()
             if connection:
                 print(f"✅ Successfully connected to PLC at {self.ip_address}:{self.port}")
+                #self.logger.info(f"✅ Successfully connected to PLC at {self.ip_address}:{self.port}")
                 return True
             else:
                 print(f"❌ Failed to connect to PLC at {self.ip_address}:{self.port}")
+                #self.logger.error(f"❌ Failed to connect to PLC at {self.ip_address}:{self.port}")
                 return False
 
         except Exception as e:
@@ -103,42 +105,42 @@ def get_dmc_number(plc_ip="10.168.158.230", plc_port=502, start_address=510, cou
         plc_client.close_connection()
 
 
-def main():
+# def main():
 
-    """Example usage of the PLC client."""
+#     """Example usage of the PLC client."""
 
-    # PLC configuration
-    plc_ip = "10.168.158.230"
-    plc_port = 502
+#     # PLC configuration
+#     plc_ip = "10.168.158.230"
+#     plc_port = 502
 
-    # Create PLC client instance
-    plc_client = PLCClient(plc_ip, plc_port)
+#     # Create PLC client instance
+#     plc_client = PLCClient(plc_ip, plc_port)
 
-    if plc_client.connect_to_plc():
+#     if plc_client.connect_to_plc():
 
-        try:
+#         try:
 
-            # Read DMC number
+#             # Read DMC number
 
-            dmc_number = plc_client.read_dmc_number(start_address=510, count=10)
+#             dmc_number = plc_client.read_dmc_number(start_address=510, count=10)
 
-            if dmc_number:
+#             if dmc_number:
 
-                print(f"Final DMC Number: {dmc_number}")
-
-           
-
-            # Example of other operations
-
-            # plc_client.write_to_d_register(address=516, value=5678)
-
-            # plc_client.read_d_register(address=516, count=1)
+#                 print(f"Final DMC Number: {dmc_number}")
 
            
 
-        finally:
+#             # Example of other operations
 
-            plc_client.close_connection()
+#             # plc_client.write_to_d_register(address=516, value=5678)
+
+#             # plc_client.read_d_register(address=516, count=1)
+
+           
+
+#         finally:
+
+#             plc_client.close_connection()
 
 
 if __name__ == "__main__":
