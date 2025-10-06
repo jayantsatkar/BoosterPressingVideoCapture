@@ -1,5 +1,7 @@
+import os
 import string
 import sys
+import time
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PyQt6.uic import loadUi
@@ -8,7 +10,11 @@ from configparser import ConfigParser
 from PlcModTCP import get_dmc_number
 from errorLogger import LogError
 import socket
+import cv2
+import numpy as np
+import mss
 
+from screen_recorder import ScreenRecorder
 class Mainwindow(QMainWindow):
     def __init__(self):
         super(Mainwindow, self).__init__()
@@ -68,9 +74,7 @@ class Mainwindow(QMainWindow):
 
     def update_led(self, color_name):
         """Set LED color dynamically"""
-        self.led.setStyleSheet(
-        f"background-color: {color_name}; border-radius: 28px;"
-        )
+        self.led.setStyleSheet(f"background-color: {color_name}; border-radius: 28px;")
 
     def cycle_start(self):
         try:
@@ -85,6 +89,9 @@ class Mainwindow(QMainWindow):
                 print(dmc_clean)
                 self.lblMessage.setText(f'Video recording started')
                 self.lblUSNText.setText(dmc_clean)
+                self.is_capture_started = True
+                self.start_capture(dmc_clean)
+                
             else:
                 self.update_led('red')
                 
@@ -93,11 +100,54 @@ class Mainwindow(QMainWindow):
             self.logger.fatal(E)
             self.update_led('red')
 
-    
+    # def start_capture(self,dmc_clean):
+        
+    #     os.makedirs("videos", exist_ok=True)
+    #     # Include DMC in the file name
+    #     output_path = f"videos/{dmc_clean}.avi"
+    #     fourcc = cv2.VideoWriter_fourcc(*"XVID")
+    #     # Define monitor (0 = primary screen)
+    #     sct = mss.mss()
+    #     monitor = sct.monitors[1]   # monitor[0] is "all monitors"
+    #     frame_width = monitor["width"]
+    #     frame_height = monitor["height"]
+    #     out = cv2.VideoWriter(output_path, fourcc, 20.0, (frame_width, frame_height))  # change resolution to your screen
+        
+    #     print("Recording... Press Ctrl+C to stop.")
+    #     try:
+    #         while self.is_capture_started == True:
+    #             # Capture screen
+    #             img = np.array(sct.grab(monitor))
+
+    #             # Convert BGRA → BGR
+    #             frame = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+    #             #time.sleep(2)   # pause for 3 seconds
+
+
+    #             # Write frame
+    #             out.write(frame)
+
+    #             # (Optional) Show preview
+    #             #cv2.imshow("Screen", frame)
+    #             if self.is_capture_started == False:
+    #                 break
+
+    #     except KeyboardInterrupt:
+    #         print("Recording stopped.")
+
+    #     out.release()
+    #     cv2.destroyAllWindows()
+        
+    def start_capture(self, dmc_clean):
+        self.recorder = ScreenRecorder(dmc_clean)
+        self.recorder.start()
+
     def cycle_stop(self):
         try:
             self.update_led('orange')
             self.logger.info('Cycle Stopped')
+            #self.is_capture_started = False
+            self.recorder.stop()
                 
             self.lblMessage.setText('Video saved successfully')
         except Exception as E:

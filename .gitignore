@@ -145,6 +145,7 @@ env.bak/
 venv.bak/
 myenv/
 logs/
+*.avi
 # Spyder project settings
 .spyderproject
 .spyproject
