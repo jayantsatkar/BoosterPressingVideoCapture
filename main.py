@@ -1,3 +1,4 @@
+import string
 import sys
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
@@ -26,20 +27,23 @@ class Mainwindow(QMainWindow):
         self.BtnStart.clicked.connect(self.start_action)
         self.BtnStop.clicked.connect(self.stop_action)
         self.BtnConfig.clicked.connect(self.config_action)
+        self.lblUSNText.setText('')
 
-        config = ConfigParser()
+        self.config = ConfigParser()
 
-        config.read('config.ini')
-        self.logger.info('Application Version:'+str(config.get('Application','VERSION')))
-        self.PLCIp = str(config.get('Application','PLCIP'))
+        self.config.read('config.ini')
+        self.logger.info('Application Version:'+str(self.config.get('Application','VERSION')))
+        self.PLCIp = str(self.config.get('Application','PLCIP'))
         print(self.PLCIp)
                 
 
     def start_action(self):
         self.update_led('green')
+        self.cycle_start()
 
     def stop_action(self):
         print("Stop clicked")
+        self.cycle_stop()
 
     def config_action(self):
       self.config_window = ConfigWindow()   # create dialog
@@ -69,8 +73,37 @@ class Mainwindow(QMainWindow):
         )
 
     def cycle_start(self):
-        self.update_led('green')
-        dmc = get_dmc_number(self.config.get('Application','plcip'),self.config.get('Application','plc_port'),666) 
+        try:
+            self.update_led('green')
+            self.logger.info('Cycle Started')
+            dmc = get_dmc_number(self.config.get('Application','plcip'),self.config.get('Application','plc_port'),10) 
+            if dmc != None:
+                #newdmc = ''.join(chr(r) for r in dmc if 32 <= r <= 126)
+                dmc_clean = ''.join(c for c in dmc if c in string.printable and not c.isspace())
+
+                self.logger.info('DMC Number Logged='+ str(dmc_clean))
+                print(dmc_clean)
+                self.lblMessage.setText(f'Video recording started')
+                self.lblUSNText.setText(dmc_clean)
+            else:
+                self.update_led('red')
+                
+                self.lblMessage.setText('Error while processing. Please check logs')
+        except Exception as E:
+            self.logger.fatal(E)
+            self.update_led('red')
+
+    
+    def cycle_stop(self):
+        try:
+            self.update_led('orange')
+            self.logger.info('Cycle Stopped')
+                
+            self.lblMessage.setText('Video saved successfully')
+        except Exception as E:
+            self.logger.fatal(E)
+            self.update_led('red')
+
 
 
 class ConfigWindow(QMainWindow):   # config dialog
@@ -129,7 +162,7 @@ class ConfigWindow(QMainWindow):   # config dialog
         print(f"Selected: {text} (ID={station_id})")
     
     def btnSave_clicked(self):
-        print('Save Button Clicked')
+        
         self.config.set("Application", "PLCIP", self.txtIP.text())
         self.config.set("Application", "plc_port", self.txtPort.text())
         self.config.set("Application", "usn_tag", self.txtUSNTag.text())

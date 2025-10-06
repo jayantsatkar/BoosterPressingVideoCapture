@@ -10,7 +10,7 @@ class LogError:
     def GetLogger():
         LOG_FORMAT = '%(levelname)s %(asctime)s -- %(message)s'
         DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
-        logging.basicConfig(filename='logs.log',format=LOG_FORMAT,level=logging.INFO, datefmt= DATE_FORMAT)
+        logging.basicConfig(filename='logs/logs.log',format=LOG_FORMAT,level=logging.INFO, datefmt= DATE_FORMAT)
         logger = logging.getLogger(__name__)
         return logger
     
@@ -23,7 +23,7 @@ class LogError:
         log_path = os.path.join(log_dir, log_name)
 
         # Create logger
-        logger = logging.getLogger("MyAppLogger")
+        logger = logging.getLogger(__name__)
         logger.setLevel(logging.INFO)
 
         # Avoid adding multiple handlers if called multiple times
