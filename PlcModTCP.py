@@ -56,7 +56,8 @@ class PLCClient:
                 if len(dmc_number) % 2 != 0:
                     swapped += dmc_number[-1]
                 print(f"🔄 Swapped DMC Number: {swapped}")
-                return swapped[:10]
+                #return swapped[:10]
+                return swapped
 
             else:
                 print(f"❌ Error reading DMC number: Response has no registers attribute")
@@ -89,6 +90,7 @@ def get_dmc_number(plc_ip="10.168.158.230", plc_port=502, start_address=510, cou
     Returns the swapped DMC number as a string, or None if failed.
     """
     plc_client = PLCClient(plc_ip, plc_port)
+    print('plc_ip=',plc_ip, ',plc_port=',plc_port, ',start_address=',start_address,',count=', count)
     try:
         if plc_client.connect_to_plc():
             dmc_number = plc_client.read_dmc_number(start_address, count)
