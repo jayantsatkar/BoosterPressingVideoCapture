@@ -1,5 +1,6 @@
 from PyQt6.QtCore import QThread, pyqtSignal
 import cv2, mss, numpy as np, os, time
+import datetime
 
 class ScreenRecorder(QThread):
     finished = pyqtSignal()
@@ -11,8 +12,15 @@ class ScreenRecorder(QThread):
         self.is_running = True
 
     def run(self):
-        os.makedirs("videos", exist_ok=True)
-        output_path = f"videos/{self.dmc_clean}.avi"
+        now = datetime.datetime.now()
+        year = now.strftime("%Y")
+        month = now.strftime("%m")
+        day = now.strftime("%d")
+        output_dir = os.path.join("videos", year, month, day)
+
+        os.makedirs(output_dir, exist_ok=True)
+        #output_path = f"videos/{self.dmc_clean}.avi"
+        output_path = os.path.join(output_dir, f"{self.dmc_clean}.avi")
         fourcc = cv2.VideoWriter_fourcc(*"XVID")
         sct = mss.mss()
         monitor = sct.monitors[1]
@@ -24,7 +32,7 @@ class ScreenRecorder(QThread):
                 img = np.array(sct.grab(monitor))
                 frame = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
                 out.write(frame)
-                time.sleep(1/20)  # ~20 FPS
+                #time.sleep(1/40)  # ~20 FPS
 
         except Exception as e:
             self.error.emit(str(e))
