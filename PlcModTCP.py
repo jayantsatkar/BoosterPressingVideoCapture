@@ -4,10 +4,13 @@ from pymodbus.exceptions import ModbusException
 
 class PLCClient:
 
-    def __init__(self, ip_address, port=502):
+    def __init__(self, ip_address, port=502, logger=None):
         self.ip_address = ip_address
         self.port = port
         self.client = None
+        self.loggerplc = logger
+        #self.loggerplc.info("Hello PLC")
+        self.connect_to_plc()
        
     def connect_to_plc(self):
         """Connect to the Mitsubishi PLC using Modbus TCP."""
@@ -19,13 +22,14 @@ class PLCClient:
                 #self.logger.info(f"✅ Successfully connected to PLC at {self.ip_address}:{self.port}")
                 return True
             else:
-                print(f"❌ Failed to connect to PLC at {self.ip_address}:{self.port}")
-                #self.logger.error(f"❌ Failed to connect to PLC at {self.ip_address}:{self.port}")
+                print(f"Failed to connect to PLC at {self.ip_address}:{self.port}")
+                self.loggerplc.error(f"Failed to connect to PLC at {self.ip_address}:{self.port}")
                 return False
 
         except Exception as e:
 
-            print(f"❌ Error connecting to PLC: {str(e)}")
+            print(f"Error connecting to PLC: {str(e)}")
+            self.logger.fatal(e)
 
             return False
 
@@ -83,28 +87,28 @@ class PLCClient:
                 print(f"❌ Error closing connection: {str(e)}")
  
 
-def get_dmc_number(plc_ip="10.168.158.230", plc_port=502, start_address=510, count=10):
+# def get_dmc_number(plc_ip="10.168.158.230", plc_port=502, start_address=510, count=10):
 
-    """
-    External function to get DMC number from PLC.
-    Returns the swapped DMC number as a string, or None if failed.
-    """
-    plc_client = PLCClient(plc_ip, plc_port)
-    print('plc_ip=',plc_ip, ',plc_port=',plc_port, ',start_address=',start_address,',count=', count)
-    try:
-        if plc_client.connect_to_plc():
-            dmc_number = plc_client.read_dmc_number(start_address, count)
-            return dmc_number
+#     """
+#     External function to get DMC number from PLC.
+#     Returns the swapped DMC number as a string, or None if failed.
+#     """
+#     plc_client = PLCClient(plc_ip, plc_port)
+#     print('plc_ip=',plc_ip, ',plc_port=',plc_port, ',start_address=',start_address,',count=', count)
+#     try:
+#         if plc_client.connect_to_plc():
+#             dmc_number = plc_client.read_dmc_number(start_address, count)
+#             return dmc_number
 
-        else:
-            print("❌ Failed to connect to PLC")
-            return None
+#         else:
+#             print("❌ Failed to connect to PLC")
+#             return None
 
-    except Exception as e:
-        print(f"❌ Error getting DMC number: {str(e)}")
-        return None
-    finally:
-        plc_client.close_connection()
+#     except Exception as e:
+#         print(f"❌ Error getting DMC number: {str(e)}")
+#         return None
+#     finally:
+#         plc_client.close_connection()
 
 
 # def main():
@@ -146,9 +150,10 @@ def get_dmc_number(plc_ip="10.168.158.230", plc_port=502, start_address=510, cou
 
 
 if __name__ == "__main__":
+    print('main method in PLC Class')
     # Test the get_dmc_number function
-    dmc = get_dmc_number()
-    if dmc:
-        print(f"Retrieved DMC Number: {dmc}")
-    else:
-        print("Failed to rerieve DMC number")
+    #dmc = get_dmc_number()
+    # if dmc:
+    #     print(f"Retrieved DMC Number: {dmc}")
+    # else:
+    #     print("Failed to rerieve DMC number")
