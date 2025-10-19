@@ -10,7 +10,6 @@ from configparser import ConfigParser
 from PlcModTCP import PLCClient #, get_dmc_number
 from errorLogger import LogError
 import socket
-import cv2
 import numpy as np
 import mss
 
@@ -24,11 +23,6 @@ class Mainwindow(QMainWindow):
         self.logger = LogError.get_logger()
 
         self.red_on = True
-        #self.green_on = False
-       
-        # self.timer = QTimer(self)
-        # self.timer.timeout.connect(self.toggle_leds)
-        # self.timer.start(1000)  # 1000 ms = 1 sec
 
         self.BtnStart.clicked.connect(self.start_action)
         self.BtnStop.clicked.connect(self.stop_action)
@@ -40,9 +34,7 @@ class Mainwindow(QMainWindow):
         self.config.read('config.ini')
         self.logger.info('Application Version:'+str(self.config.get('Application','VERSION')))
         self.PLCIp = str(self.config.get('Application','PLCIP'))
-        self.logger.info('PLC IP:'+str(self.config.get('Application','PLCIP')))
-        print(self.PLCIp)
-                
+        self.logger.info('PLC IP:'+str(self.config.get('Application','PLCIP')))                
 
     def start_action(self):
         self.update_led('green')
@@ -53,8 +45,14 @@ class Mainwindow(QMainWindow):
         self.cycle_stop()
 
     def config_action(self):
-      self.config_window = ConfigWindow()   # create dialog
-      self.config_window.show()  
+      enable_config = self.config.getboolean("Application", "enable_config", fallback=False)
+      
+      if enable_config == True:
+        self.config_window = ConfigWindow()   # create dialog
+        self.config_window.show() 
+      else:
+            QMessageBox.warning(self, "Warning", "Access denied!")
+
 
     def toggle_leds(self):
         """Swap red/green LED states"""
@@ -128,7 +126,6 @@ class Mainwindow(QMainWindow):
 
 class ConfigWindow(QMainWindow):   # config dialog
     def __init__(self):
-        print('Open Config Window')
         super(ConfigWindow, self).__init__()
         loadUi("configuration.ui", self)
 
