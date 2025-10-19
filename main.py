@@ -40,6 +40,7 @@ class Mainwindow(QMainWindow):
         self.config.read('config.ini')
         self.logger.info('Application Version:'+str(self.config.get('Application','VERSION')))
         self.PLCIp = str(self.config.get('Application','PLCIP'))
+        self.logger.info('PLC IP:'+str(self.config.get('Application','PLCIP')))
         print(self.PLCIp)
                 
 
