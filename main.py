@@ -1,6 +1,7 @@
 import os
 import string
 import sys
+import threading
 import time
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
@@ -31,11 +32,69 @@ class Mainwindow(QMainWindow):
         self.lblUSNText.setText('')
 
         self.config = ConfigParser()
+        self._stop_event = threading.Event()
 
         self.config.read('config.ini')
         self.logger.info('Application Version:'+str(self.config.get('Application','VERSION')))
         self.PLCIp = str(self.config.get('Application','PLCIP'))
-        self.logger.info('PLC IP:'+str(self.config.get('Application','PLCIP')))                
+        self.logger.info('PLC IP:'+str(self.config.get('Application','PLCIP')))     
+        self.addr_cycle_start_stop = int(self.config.get('Application', 'cycle_start_stop'))     
+        self.addr_heartbeat = int(self.config.get('Application', 'heartbeat_tag')) 
+
+        plc = PLCClient(self.config.get('Application','plcip'),int(self.config.get('Application','plc_port')),self.logger)
+        self.plc = plc
+
+        threading.Thread(target=self._send_heartbeat, daemon=True).start()     
+        threading.Thread(target=self._monitor_cycle, daemon=True).start()
+
+    def _send_heartbeat(self):
+        """Toggle heartbeat bit periodically"""
+        toggle = False
+        while not self._stop_event.is_set():
+            try:
+                self.plc.write_bool(self.addr_heartbeat, toggle)
+                toggle = not toggle
+                time.sleep(0.5)
+            except Exception as ex:
+                if self.logger:
+                    self.logger.error(f"Heartbeat error: {ex}")
+                else:
+                    print("Heartbeat error:", ex)
+                time.sleep(2)
+
+    def _monitor_cycle(self):
+        """Monitor single tag for cycle start/stop and read DMC"""
+        last_cycle_state = False  # previous value
+
+        while not self._stop_event.is_set():
+            try:
+                cycle_state = self.plc.read_bool( address = self.addr_cycle_start_stop)  # same tag for start/stop
+
+                # Rising edge → cycle started
+                if cycle_state and not last_cycle_state:
+                    dmc = self.plc.read_dmc_number(int(self.config.get('Application','usn_tag')), count=10)
+                    if self.logger:
+                        self.logger.info(f"Cycle Started. DMC: {dmc}")
+                    else:
+                        print(f"Cycle Started. DMC: {dmc}")
+
+                # Falling edge → cycle stopped
+                if not cycle_state and last_cycle_state:
+                    if self.logger:
+                        self.logger.info("Cycle Stopped")
+                    else:
+                        print("Cycle Stopped")
+
+                # Remember last state for edge detection
+                last_cycle_state = cycle_state
+
+                time.sleep(0.5)
+            except Exception as ex:
+                if self.logger:
+                    self.logger.error(f"Cycle monitor error: {ex}")
+                else:
+                    print("Cycle monitor error:", ex)
+                time.sleep(2)
 
     def start_action(self):
         self.update_led('green')
@@ -82,8 +141,9 @@ class Mainwindow(QMainWindow):
             self.logger.info('Cycle Started')
             #dmc = get_dmc_number(self.config.get('Application','plcip'),self.config.get('Application','plc_port'),10) 
 
-            plc = PLCClient(self.config.get('Application','plcip'),int(self.config.get('Application','plc_port')),self.logger)
-            dmc = plc.read_dmc_number(int(self.config.get('Application','usn_tag')), count=10)
+            #plc = PLCClient(self.config.get('Application','plcip'),int(self.config.get('Application','plc_port')),self.logger)
+            #self.plc = plc
+            dmc = self.plc.read_dmc_number(int(self.config.get('Application','usn_tag')), count=10)
             #dmc = ""
 
             if dmc != None:

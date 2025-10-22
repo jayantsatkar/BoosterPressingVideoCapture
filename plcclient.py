@@ -83,7 +83,7 @@ class PLCClient:
         """Read a single coil"""
         if not self.connected:
             self.connect()
-        rr = self.client.read_coils(address, 1)
+        rr = self.client.read_coils(address = address, count = 1)
         if rr.isError():
             return None
         return bool(rr.bits[0])
