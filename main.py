@@ -7,7 +7,8 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PyQt6.uic import loadUi
 from PyQt6.QtCore import QTimer
 from configparser import ConfigParser
-from PlcModTCP import PLCClient #, get_dmc_number
+#from PlcModTCP import PLCClient_original #, get_dmc_number
+from plcclient import PLCClient #, get_dmc_number
 from errorLogger import LogError
 import socket
 import numpy as np
@@ -81,7 +82,7 @@ class Mainwindow(QMainWindow):
             self.logger.info('Cycle Started')
             #dmc = get_dmc_number(self.config.get('Application','plcip'),self.config.get('Application','plc_port'),10) 
 
-            plc = PLCClient(self.config.get('Application','plcip'),self.config.get('Application','plc_port'),self.logger)
+            plc = PLCClient(self.config.get('Application','plcip'),int(self.config.get('Application','plc_port')),self.logger)
             dmc = plc.read_dmc_number(int(self.config.get('Application','usn_tag')), count=10)
             #dmc = ""
 
@@ -90,7 +91,7 @@ class Mainwindow(QMainWindow):
                 dmc_clean = ''.join(c for c in dmc if c in string.printable and not c.isspace())
 
                 self.logger.info('DMC Number Logged='+ str(dmc_clean))
-                print(dmc_clean)
+                
                 self.lblMessage.setText(f'Video recording started')
                 self.lblUSNText.setText(dmc_clean)
                 self.is_capture_started = True

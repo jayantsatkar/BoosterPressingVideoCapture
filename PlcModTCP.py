@@ -1,16 +1,22 @@
+import threading
 import time
 from pymodbus.client import ModbusTcpClient
 from pymodbus.exceptions import ModbusException
 
-class PLCClient:
+class PLCClient_original:
 
     def __init__(self, ip_address, port=502, logger=None):
         self.ip_address = ip_address
         self.port = port
-        self.client = None
-        self.loggerplc = logger
+        #if self.client is None:
+        if not hasattr(self, 'client') or self.client is None:
+            self.connect_to_plc()
+            self.loggerplc = logger
+            self.loggerplc.info('PLCClient CTOR initiated')
+        else:
+            self.loggerplc.info('PLCClient CTOR already initiated')
         #self.loggerplc.info("Hello PLC")
-        self.connect_to_plc()
+        #self.connect_to_plc()
        
     def connect_to_plc(self):
         """Connect to the Mitsubishi PLC using Modbus TCP."""
@@ -82,10 +88,27 @@ class PLCClient:
         if self.client:
             try:
                 self.client.close()
+                self.connected = False
                 print("🔌 Connection closed")
             except Exception as e:
                 print(f"❌ Error closing connection: {str(e)}")
  
+    def read_coil(self, addr):
+        try:
+            self.connect()
+            rr = self.client.read_coils(addr, 1)
+            if not rr.isError():
+                return rr.bits[0]
+        except Exception as e:
+            print(f"[PLC] Coil read error: {e}")
+        return None
+
+    def write_coil(self, addr, value):
+        try:
+            self.connect()
+            self.client.write_coil(addr, value)
+        except Exception as e:
+            print(f"[PLC] Coil write error: {e}")
 
 # def get_dmc_number(plc_ip="10.168.158.230", plc_port=502, start_address=510, count=10):
 
@@ -157,3 +180,63 @@ if __name__ == "__main__":
     #     print(f"Retrieved DMC Number: {dmc}")
     # else:
     #     print("Failed to rerieve DMC number")
+
+
+
+
+class HeartbeatThread(threading.Thread):
+    def __init__(self, plc_client, coil_addr, interval=0.5):
+        super().__init__(daemon=True)
+        self.plc = plc_client
+        self.coil_addr = coil_addr
+        self.interval = interval
+        self.running = True
+
+    def run(self):
+        print("[Heartbeat] Thread started.")
+        state = False
+        while self.running:
+            state = not state
+            self.plc.write_coil(self.coil_addr, state)
+            time.sleep(self.interval)
+
+    def stop(self):
+        self.running = False
+
+
+class CycleMonitor:
+    def __init__(self, plc_client):
+        self.plc = plc_client
+        self.prev_state = False
+        self.current_dmc = None
+
+    # def log_data(self, dmc):
+    #     """Save stop event + DMC to CSV"""
+    #     with open("cycle_log.csv", "a", newline="") as f:
+    #         writer = csv.writer(f)
+    #         writer.writerow([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), dmc])
+    #     print(f"[LOG] Saved DMC {dmc}")
+
+    def monitor(self):
+        print("[CycleMonitor] Monitoring cycle start/stop...")
+        while True:
+            state = self.plc.read_coil(CYCLE_COIL)
+
+            if state is None:
+                time.sleep(0.5)
+                continue
+
+            # Rising edge = START
+            if state and not self.prev_state:
+                self.current_dmc = self.plc.read_dmc()
+                print(f"[CYCLE] START detected. DMC={self.current_dmc}")
+
+            # Falling edge = STOP
+            elif not state and self.prev_state:
+                if self.current_dmc:
+                    self.log_data(self.current_dmc)
+                    print("[CYCLE] STOP detected.")
+                    self.current_dmc = None
+
+            self.prev_state = state
+            time.sleep(0.2)  # polling interval
