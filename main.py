@@ -73,10 +73,13 @@ class Mainwindow(QMainWindow):
                 # Rising edge → cycle started
                 if cycle_state and not last_cycle_state:
                     dmc = self.plc.read_dmc_number(int(self.config.get('Application','usn_tag')), count=10)
+                    if dmc != None:
+                        dmc_clean = ''.join(c for c in dmc if c in string.printable and not c.isspace())
+                        self.logger.info('DMC Number Logged='+ str(dmc_clean))
                     if self.logger:
-                        self.logger.info(f"Cycle Started. DMC: {dmc}")
+                        self.logger.info(f"Cycle Started. DMC: {dmc_clean}")
                     else:
-                        print(f"Cycle Started. DMC: {dmc}")
+                        print(f"Cycle Started. DMC: {dmc_clean}")
 
                 # Falling edge → cycle stopped
                 if not cycle_state and last_cycle_state:

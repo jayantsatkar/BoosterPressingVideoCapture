@@ -1,6 +1,7 @@
 import threading
+import time
 from pymodbus.client import ModbusTcpClient
-from pymodbus.exceptions import ModbusException
+from pymodbus.exceptions import ModbusException , ConnectionException
 
 class PLCClient:
     _instance = None
@@ -31,13 +32,31 @@ class PLCClient:
 
 
     def connect(self):
-       if self.client is None:
-            self.client = ModbusTcpClient(host = self.ip,port = self.port)
-            self.connected = self.client.connect()
+        """Try to connect or reconnect"""
+
+        try:
+            if self.client is None:
+                self.client = ModbusTcpClient(host = self.ip,port = self.port)
+
+            if not self.client.connected: 
+                self.connected = self.client.connect()
+                if self.logger:
+                    self.logger.info(f"PLC connected: {self.connected}")
+                else:
+                    print(f"PLC connected: {self.connected}")
+        except Exception as ex:
+            self.connected = False
             if self.logger:
-                self.logger.info(f"PLC connected: {self.connected}")
+                 self.logger.error(f"PLC connection error: {ex}")
             else:
-                print(f"PLC connected: {self.connected}")
+                print("PLC connection error:", ex)
+            time.sleep(2)
+
+    def ensure_connection(self):
+        """Ensure we have a valid connection"""
+        if not self.client or not self.client.connected:
+            self.connect()
+
 
     def read_dmc_number(self, start_address=510, count=10):
 
@@ -46,11 +65,15 @@ class PLCClient:
         then swap alternate characters (pairwise).
         Returns the swapped DMC number as a string.
         """
-        if not self.connected:
-           self.connect()
+        # if not self.connected:
+        #    self.connect()
 
         try:
+            self.ensure_connection()
             response = self.client.read_holding_registers(address=start_address, count=count)
+            if response.isError():
+                raise ConnectionException("Modbus read error")
+            
             if hasattr(response, 'registers'):
                 registers = response.registers
                 # Convert 16-bit registers to bytes
@@ -71,30 +94,57 @@ class PLCClient:
                 print(f"❌ Error reading DMC number: Response has no registers attribute")
                 return None
 
-        except ModbusException as e:
-            print(f"❌ Modbus error reading DMC number: {str(e)}")
-            return None
-
-        except Exception as e:
-            print(f"❌ Unexpected error reading DMC number: {str(e)}")
+        except Exception as ex:
+            print(f"❌ Unexpected error reading DMC number: {str(ex)}")
+            self.connected = False
+            if self.logger:
+                self.logger.error(f"PLC read_dmc_number error: {ex}")
+            else:
+                print("PLC read_dmc_number error:", ex)
+            self.connect()
             return None
 
     def read_bool(self, address):
-        """Read a single coil"""
-        if not self.connected:
+        """Read a single coil safely with reconnect"""
+        try:
+            self.ensure_connection()
+            rr = self.client.read_coils(address = address, count = 1)
+            if rr.isError():
+                raise ConnectionException("Modbus read error")
+            return bool(rr.bits[0])
+
+        except Exception as ex:
+            self.connected = False
+            if self.logger:
+                self.logger.error(f"PLC read_bool error: {ex}")
+            else:
+                print("PLC read_bool error:", ex)
             self.connect()
-        rr = self.client.read_coils(address = address, count = 1)
-        if rr.isError():
             return None
-        return bool(rr.bits[0])
+            
 
     def write_bool(self, address, value):
         """Write a single coil"""
-        if not self.connected:
+        try:
+            self.ensure_connection()
+            self.client.write_coil(address=address, value=value)
+        except Exception as ex:
+            self.connected = False
+            if self.logger:
+                self.logger.error(f"PLC write_bool error: {ex}")
+            else:
+                print("PLC write_bool error:", ex)
             self.connect()
-        self.client.write_coil(address, value)
+
+    # def close(self):
+    #     if self.client and self.connected:
+    #         self.client.close()
+    #         self.connected = False
 
     def close(self):
-        if self.client and self.connected:
+        """Close the connection gracefully"""
+        if self.client and self.client.connected:
             self.client.close()
             self.connected = False
+            if self.logger:
+                self.logger.info("PLC connection closed")
