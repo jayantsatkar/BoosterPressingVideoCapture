@@ -80,7 +80,7 @@ class PLCClient:
                 byte_data = b''.join(reg.to_bytes(2, byteorder='big') for reg in registers)
                 # Try to decode as ASCII string (strip null bytes)
                 dmc_number = byte_data.decode('ascii', errors='ignore').strip('\x00')
-                print(f"📥 Original DMC Number from D{start_address}-D{start_address+count-1}: {dmc_number}")
+                #print(f"📥 Original DMC Number from D{start_address}-D{start_address+count-1}: {dmc_number}")
                 # Swap alternate characters (pairwise swap)
                 swapped = ''.join(dmc_number[i+1] + dmc_number[i] for i in range(0, len(dmc_number)-1, 2))
                 # If odd length, keep last char

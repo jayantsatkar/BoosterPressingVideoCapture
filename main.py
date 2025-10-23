@@ -31,6 +31,8 @@ class Mainwindow(QMainWindow):
         self.BtnConfig.clicked.connect(self.config_action)
         self.lblUSNText.setText('')
 
+        
+
         self.config = ConfigParser()
         self._stop_event = threading.Event()
 
@@ -40,12 +42,21 @@ class Mainwindow(QMainWindow):
         self.logger.info('PLC IP:'+str(self.config.get('Application','PLCIP')))     
         self.addr_cycle_start_stop = int(self.config.get('Application', 'cycle_start_stop'))     
         self.addr_heartbeat = int(self.config.get('Application', 'heartbeat_tag')) 
-
         plc = PLCClient(self.config.get('Application','plcip'),int(self.config.get('Application','plc_port')),self.logger)
         self.plc = plc
 
-        threading.Thread(target=self._send_heartbeat, daemon=True).start()     
-        threading.Thread(target=self._monitor_cycle, daemon=True).start()
+        self.logger.info('Manual Mode::' + str(self.config.getboolean("Application", "manual_mode")))
+
+        ### Manual Mode
+        # if self.config.getboolean("Application", "manual_mode", fallback=False):
+        #     self.BtnStart.setEnabled(True)  # Disable the button
+        #     self.BtnStop.setEnabled(True)   # Disable the button
+        if self.config.getboolean("Application", "manual_mode", fallback=False) == False:
+            self.logger.info('APPLICATION RUNNING IN AUTO-MODE')
+            threading.Thread(target=self._send_heartbeat, daemon=True).start()     
+            threading.Thread(target=self._monitor_cycle, daemon=True).start()
+            self.BtnStart.setEnabled(True)  # Disable the button
+            self.BtnStop.setEnabled(True)   # Disable the button
 
     def _send_heartbeat(self):
         """Toggle heartbeat bit periodically"""
@@ -76,6 +87,15 @@ class Mainwindow(QMainWindow):
                     if dmc != None:
                         dmc_clean = ''.join(c for c in dmc if c in string.printable and not c.isspace())
                         self.logger.info('DMC Number Logged='+ str(dmc_clean))
+
+                        ##Capture Video 
+                        self.update_led('green')
+                        self.lblMessage.setText(f'Video recording started')
+                        self.lblUSNText.setText(dmc_clean)
+                        self.is_capture_started = True
+                        self.dmc = dmc_clean
+                        self.start_capture(dmc_clean)
+                    
                     if self.logger:
                         self.logger.info(f"Cycle Started. DMC: {dmc_clean}")
                     else:
@@ -84,7 +104,14 @@ class Mainwindow(QMainWindow):
                 # Falling edge → cycle stopped
                 if not cycle_state and last_cycle_state:
                     if self.logger:
-                        self.logger.info("Cycle Stopped")
+                        
+                        self.update_led('orange')
+                        self.lblUSNText.setText('')
+                        self.logger.info('Cycle Stopped')
+                        #self.is_capture_started = False
+                        self.recorder.stop()
+                
+                        self.lblMessage.setText('Video saved successfully')
                     else:
                         print("Cycle Stopped")
 
@@ -94,6 +121,7 @@ class Mainwindow(QMainWindow):
                 time.sleep(0.5)
             except Exception as ex:
                 if self.logger:
+                    self.update_led('red')
                     self.logger.error(f"Cycle monitor error: {ex}")
                 else:
                     print("Cycle monitor error:", ex)
@@ -214,8 +242,8 @@ class ConfigWindow(QMainWindow):   # config dialog
 
 
         ##ack Tag
-        ack_tag = str(self.config.get('Application','ack_tag'))
-        self.txtAckTag.setText(ack_tag)
+        heartbeat_tag = str(self.config.get('Application','heartbeat_tag'))
+        self.txtAckTag.setText(heartbeat_tag)
 
 
         ##Cycle Start
@@ -247,7 +275,7 @@ class ConfigWindow(QMainWindow):   # config dialog
         self.config.set("Application", "PLCIP", self.txtIP.text())
         self.config.set("Application", "plc_port", self.txtPort.text())
         self.config.set("Application", "usn_tag", self.txtUSNTag.text())
-        self.config.set("Application", "ack_tag", self.txtAckTag.text())
+        self.config.set("Application", "heartbeat_tag", self.txtAckTag.text())
 
         selected_id = self.comboPLC.currentData()   
         self.config.set("Application", "plc_id", selected_id)
