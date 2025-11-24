@@ -55,8 +55,8 @@ class Mainwindow(QMainWindow):
             self.logger.info('APPLICATION RUNNING IN AUTO-MODE')
             threading.Thread(target=self._send_heartbeat, daemon=True).start()     
             threading.Thread(target=self._monitor_cycle, daemon=True).start()
-            self.BtnStart.setEnabled(True)  # Disable the button
-            self.BtnStop.setEnabled(True)   # Disable the button
+            self.BtnStart.setEnabled(False)  # Disable the button
+            self.BtnStop.setEnabled(False)   # Disable the button
 
     def _send_heartbeat(self):
         """Toggle heartbeat bit periodically"""
