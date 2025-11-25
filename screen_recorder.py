@@ -10,6 +10,7 @@ class ScreenRecorder(QThread):
         super().__init__()
         self.dmc_clean = dmc_clean
         self.is_running = True
+        self.current_file_path = None
 
     def run(self):
         now = datetime.datetime.now()
@@ -19,8 +20,9 @@ class ScreenRecorder(QThread):
         output_dir = os.path.join("videos", year, month, day)
 
         os.makedirs(output_dir, exist_ok=True)
-        #output_path = f"videos/{self.dmc_clean}.avi"
+
         output_path = os.path.join(output_dir, f"{self.dmc_clean}.avi")
+        self.current_file_path = output_path
         fourcc = cv2.VideoWriter_fourcc(*"XVID")
         sct = mss.mss()
         monitor = sct.monitors[1]
