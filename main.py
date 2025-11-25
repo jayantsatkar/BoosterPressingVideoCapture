@@ -1,4 +1,7 @@
+import ctypes
+from datetime import datetime
 import os
+import re
 import string
 import sys
 import threading
@@ -83,33 +86,52 @@ class Mainwindow(QMainWindow):
 
                 # Rising edge → cycle started
                 if cycle_state and not last_cycle_state:
-                    dmc = self.plc.read_dmc_number(int(self.config.get('Application','usn_tag')), count=10)
-                    if dmc != None:
-                        dmc_clean = ''.join(c for c in dmc if c in string.printable and not c.isspace())
-                        self.logger.info('DMC Number Logged='+ str(dmc_clean))
+                    # dmc = self.plc.read_dmc_number(int(self.config.get('Application','usn_tag')), count=10)
+                    # if dmc != None:
+                    #     dmc_clean = ''.join(c for c in dmc if c in string.printable and not c.isspace())
+                    #     self.logger.info('DMC Number Logged='+ str(dmc_clean))
 
-                        ##Capture Video 
-                        self.update_led('green')
-                        self.lblMessage.setText(f'Video recording started')
-                        self.lblUSNText.setText(dmc_clean)
-                        self.is_capture_started = True
-                        self.dmc = dmc_clean
-                        self.start_capture(dmc_clean)
+                    #     ##Capture Video 
+                    self.update_led('green')
+                    self.lblMessage.setText(f'Video recording started')
+                    #     self.lblUSNText.setText(dmc_clean)
+                    self.is_capture_started = True
+                    #     self.dmc = dmc_clean
+                    self.start_capture('current')
+                    self.logger.info(f"Cycle Started.")
                     
-                    if self.logger:
-                        self.logger.info(f"Cycle Started. DMC: {dmc_clean}")
-                    else:
-                        print(f"Cycle Started. DMC: {dmc_clean}")
 
                 # Falling edge → cycle stopped
                 if not cycle_state and last_cycle_state:
                     if self.logger:
                         
+                        dmc = self.plc.read_dmc_number(int(self.config.get('Application','usn_tag')), count=10)
+                        if dmc != None:
+                            dmc_clean = ''.join(c for c in dmc if c in string.printable and not c.isspace())
+                            dmc_no_ascii = re.sub(r'[\x00-\x1F\x7F]', '', dmc_clean).strip()
+                            self.logger.info('DMC Number Logged='+ str(dmc_no_ascii))
                         self.update_led('orange')
-                        self.lblUSNText.setText('')
+                        self.lblUSNText.setText(dmc_clean)
+
+                        old_path = self.recorder.current_file_path
+                        timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+                        new_filename = f"{timestamp}_{dmc_no_ascii}.avi"
+
+                        new_path = old_path.replace("current.avi", new_filename)
+                        #new_path = old_path.replace("current.avi", f"{str(dmc_no_ascii)}.avi")
+                        # print("RAW DMC repr:", repr(dmc_no_ascii))
+                        # print(old_path)
+                        # print(new_path)
+
+                        #os.rename(old_path, new_path)
                         self.logger.info('Cycle Stopped')
+                        #self.logger.info(self.recorder.current_file_path)
                         #self.is_capture_started = False
                         self.recorder.stop()
+                        time.sleep(0.2)
+                        
+                        os.rename(old_path, new_path)
+                        
                 
                         self.lblMessage.setText('Video saved successfully')
                     else:
@@ -126,7 +148,7 @@ class Mainwindow(QMainWindow):
                 else:
                     print("Cycle monitor error:", ex)
                 time.sleep(2)
-
+    
     def start_action(self):
         self.update_led('green')
         self.cycle_start()
@@ -186,7 +208,7 @@ class Mainwindow(QMainWindow):
                 self.lblMessage.setText(f'Video recording started')
                 self.lblUSNText.setText(dmc_clean)
                 self.is_capture_started = True
-                self.dmc = dmc_clean
+                #self.dmc = dmc_clean
                 self.start_capture(dmc_clean)
                 
                 

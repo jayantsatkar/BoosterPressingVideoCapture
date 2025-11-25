@@ -150,7 +150,7 @@ QPushButton:pressed {
      <rect>
       <x>40</x>
       <y>220</y>
-      <width>51</width>
+      <width>121</width>
       <height>31</height>
      </rect>
     </property>
@@ -159,7 +159,7 @@ QPushButton:pressed {
 font: 14pt &quot;Segoe UI&quot;;</string>
     </property>
     <property name="text">
-     <string>USN</string>
+     <string>Previous USN</string>
     </property>
    </widget>
    <widget class="QLabel" name="lblPow">
@@ -182,7 +182,7 @@ font: 11pt &quot;Segoe UI&quot;;</string>
    <widget class="QLabel" name="lblUSNText">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>190</x>
       <y>220</y>
       <width>131</width>
       <height>31</height>
