@@ -56,7 +56,7 @@ class Mainwindow(QMainWindow):
         #     self.BtnStop.setEnabled(True)   # Disable the button
         if self.config.getboolean("Application", "manual_mode", fallback=False) == False:
             self.logger.info('APPLICATION RUNNING IN AUTO-MODE')
-            threading.Thread(target=self._send_heartbeat, daemon=True).start()     
+            #threading.Thread(target=self._send_heartbeat, daemon=True).start()     
             threading.Thread(target=self._monitor_cycle, daemon=True).start()
             self.BtnStart.setEnabled(False)  # Disable the button
             self.BtnStop.setEnabled(False)   # Disable the button
@@ -66,7 +66,7 @@ class Mainwindow(QMainWindow):
         toggle = False
         while not self._stop_event.is_set():
             try:
-                self.plc.write_bool(self.addr_heartbeat, toggle)
+                self.plc.write_register(self.addr_heartbeat, toggle)
                 toggle = not toggle
                 time.sleep(0.5)
             except Exception as ex:
@@ -82,8 +82,10 @@ class Mainwindow(QMainWindow):
 
         while not self._stop_event.is_set():
             try:
-                cycle_state = self.plc.read_bool( address = self.addr_cycle_start_stop)  # same tag for start/stop
-
+                
+                response = self.plc.client.read_holding_registers(address=self.addr_cycle_start_stop, count=1)
+                cycle_state = response.registers[0]
+                
                 # Rising edge → cycle started
                 if cycle_state and not last_cycle_state:
                     # dmc = self.plc.read_dmc_number(int(self.config.get('Application','usn_tag')), count=10)
