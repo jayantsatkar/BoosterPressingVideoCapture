@@ -16,7 +16,7 @@ from plcclient import PLCClient #, get_dmc_number
 from errorLogger import LogError
 import socket
 import numpy as np
-import mss
+from move_files import FileMover
 
 from screen_recorder import ScreenRecorder
 class Mainwindow(QMainWindow):
@@ -34,8 +34,6 @@ class Mainwindow(QMainWindow):
         self.BtnConfig.clicked.connect(self.config_action)
         self.lblUSNText.setText('')
 
-        
-
         self.config = ConfigParser()
         self._stop_event = threading.Event()
 
@@ -50,14 +48,11 @@ class Mainwindow(QMainWindow):
 
         self.logger.info('Manual Mode::' + str(self.config.getboolean("Application", "manual_mode")))
 
-        ### Manual Mode
-        # if self.config.getboolean("Application", "manual_mode", fallback=False):
-        #     self.BtnStart.setEnabled(True)  # Disable the button
-        #     self.BtnStop.setEnabled(True)   # Disable the button
         if self.config.getboolean("Application", "manual_mode", fallback=False) == False:
             self.logger.info('APPLICATION RUNNING IN AUTO-MODE')
             threading.Thread(target=self._send_heartbeat, daemon=True).start()     
             threading.Thread(target=self._monitor_cycle, daemon=True).start()
+            threading.Thread(target=self._move_files, daemon=True).start()
             self.BtnStart.setEnabled(False)  # Disable the button
             self.BtnStop.setEnabled(False)   # Disable the button
 
@@ -151,6 +146,12 @@ class Mainwindow(QMainWindow):
                     print("Cycle monitor error:", ex)
                 time.sleep(2)
     
+    def _move_files(self):
+        targetdirectory = str(self.config.get('Application','targetdirectory'))
+        targetdays = int(self.config.get('Application','targetdays'))
+        FileMover.move_all('videos',targetdirectory,True,targetdays)
+
+
     def start_action(self):
         self.update_led('green')
         self.cycle_start()
