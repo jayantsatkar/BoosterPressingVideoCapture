@@ -56,7 +56,7 @@ class Mainwindow(QMainWindow):
         #     self.BtnStop.setEnabled(True)   # Disable the button
         if self.config.getboolean("Application", "manual_mode", fallback=False) == False:
             self.logger.info('APPLICATION RUNNING IN AUTO-MODE')
-            #threading.Thread(target=self._send_heartbeat, daemon=True).start()     
+            threading.Thread(target=self._send_heartbeat, daemon=True).start()     
             threading.Thread(target=self._monitor_cycle, daemon=True).start()
             self.BtnStart.setEnabled(False)  # Disable the button
             self.BtnStop.setEnabled(False)   # Disable the button
@@ -64,9 +64,9 @@ class Mainwindow(QMainWindow):
     def _send_heartbeat(self):
         """Toggle heartbeat bit periodically"""
         toggle = False
-        while not self._stop_event.is_set():
+        while True:
             try:
-                self.plc.write_register(self.addr_heartbeat, toggle)
+                self.plc.client.write_register(address= self.addr_heartbeat,value= toggle)
                 toggle = not toggle
                 time.sleep(0.5)
             except Exception as ex:

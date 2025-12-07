@@ -1,15 +1,16 @@
 from pymodbus.client import ModbusTcpClient
 
-PLC_IP = "10.168.64.34"
+PLC_IP = "10.168.64.104"
 PLC_PORT = 502
 UNIT_ID = 0           # Mitsubishi module slave id
 
-offset = 3500         # register offset (adjust based on mapping)
+address = 1         # register offset (adjust based on mapping)
 
 client = ModbusTcpClient(PLC_IP, port=PLC_PORT)
 client.connect()
 #print(client)
-response = client.read_holding_registers(address=3500, count=1)
+response = client.read_holding_registers(address=address, count=1)
+
 if hasattr(response, 'registers'):
                 registers = response.registers[0]
                 print(registers)
