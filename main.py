@@ -19,13 +19,27 @@ import numpy as np
 from move_files import FileMover
 
 from screen_recorder import ScreenRecorder
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath('.')
+    return os.path.join(base_path,relative_path)
 class Mainwindow(QMainWindow):
     def __init__(self):
         super(Mainwindow, self).__init__()
         self.setWindowTitle("Video Capture Station")
-        loadUi("main.ui", self)
-        #self.logger = LogError.GetLogger()
+        #1 CONFIG LOAD    
+        self.config = ConfigParser()
+        self.config.read(resource_path('config.ini'))
+
+        # 2 LOGGER
         self.logger = LogError.get_logger()
+
+        # 3 UI 
+        
+        loadUi(resource_path("main.ui"), self)
 
         self.red_on = True
 
@@ -34,10 +48,10 @@ class Mainwindow(QMainWindow):
         self.BtnConfig.clicked.connect(self.config_action)
         self.lblUSNText.setText('')
 
-        self.config = ConfigParser()
+        
         self._stop_event = threading.Event()
 
-        self.config.read('config.ini')
+        
         self.logger.info('Application Version:'+str(self.config.get('Application','VERSION')))
         self.PLCIp = str(self.config.get('Application','PLCIP'))
         self.logger.info('PLC IP:'+str(self.config.get('Application','PLCIP')))     
